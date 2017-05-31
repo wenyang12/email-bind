@@ -1,7 +1,7 @@
 <template>
   <section>
-    <article></article>
-    <footer class="footer" :class="{disabled: !hasSelect}" ref="footer" @click.stop.prevent="submit">提&nbsp;交</footer>
+    <inputbind :inputData="item" v-for="(item, index) in inputDatas" :key="index"></inputbind>
+    <footer class="footer" :class="{disabled: isEmpty}" ref="footer" @click.stop.prevent="submit">提&nbsp;交</footer>
   </section>
 </template>
 
@@ -9,13 +9,25 @@
 import Loading from '@/components/base/loading'
 import Success from '@/components/base/success'
 import Api from '@/core/service/service'
+import Inputbind from '@/components/base/inputbind'
 
 export default {
   name: 'app',
+  components: {
+    Inputbind
+  },
   data () {
     return {
       loadingTimer: null,
-      otherReason: ''
+      otherReason: '',
+      isEmpty: true,
+      inputDatas: [{
+        type: 'text',
+        text: '邮箱账号'
+      }, {
+        type: 'password',
+        text: '密  码'
+      }]
     }
   },
   methods: {
