@@ -26,7 +26,7 @@ export default {
     Vue.nextTick(() => {
       toastInstance.visible = true;
       toastTimer = setTimeout(() => {
-        this.visible = false;
+        toastInstance.visible = false;
         if (toastInstance.$el) {
           toastInstance.$el.style.display = 'none';
         }
