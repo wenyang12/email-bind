@@ -1,7 +1,7 @@
 <template>
   <div class="input-wraper" >
-    <div  class="input-left" >{{inputDatas.text}}</div>
-    <div class="input-right"><input :type="inputDatas.type" :placeholder="inputDatas.placeholder" :name="inputDatas.name" :value="value" @input="updateValue($event.target)" ></div>
+    <div  class="input-left" :class="'label-' + inputDatas.name" >{{inputDatas.text}}</div>
+    <div class="input-right" :class="'input-' + inputDatas.type"><input :type="inputDatas.type" :class="{active:value}" :placeholder="inputDatas.placeholder"  :name="inputDatas.name" :value="value" @input="updateValue($event.target)" @change="radioChange($event.target)" ></div>
   </div>
 </template>
 
@@ -16,10 +16,18 @@
       }
     },
     methods: {
-      updateValue: function(target){
+      updateValue (target) {
         let value = target.value
         let name = target.name
-        target.value = value
+        this.value = value
+        this.$emit('input',value,name)
+      },
+      radioChange (target) {
+        if (target.type !== 'checkbox') {
+          return
+        }
+        let value = target.checked;
+        let name = target.name
         this.value = value
         this.$emit('input',value,name)
       }
@@ -44,9 +52,44 @@
     input{
       border:none;
     }
+    input[type='checkbox']{
+      width: 52/25rem;
+      height: 32/25rem;
+      background:#fff;
+      border-radius: 25/25rem;
+      position:relative;
+      box-shadow:inset 1px 1px 2px 1px rgba(0,0,0,.1);
+      &:after{
+        content: '';
+        position:absolute;
+        width: 28/25rem;
+        height: 28/25rem;
+        border-radius: 50%;
+        background: #fff;
+        left:2/25rem;
+        right:initial;
+        top:2/25rem;
+        box-shadow: 1px 1px 3px 1px rgba(0,0,0,.2);
+      }
+      &.active{
+        background:#ffac38;
+        &:after{
+        right:2/25rem;
+        left:initial;
+        top:2/25rem;
+      }
+      }
+    }
   }
   .input-left{
     flex: 0 0 68/25rem;
+    text-align: right;
+  }
+  .label-password{
+    letter-spacing:9.5/25rem;
+  }
+  .input-checkbox{
+    text-align: right;
   }
   .input-right{
   flex: auto;
