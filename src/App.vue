@@ -1,21 +1,29 @@
 <template>
   <section>
-    <article class="article">
-      <inputbind :inputDatas="item" v-for="(item, index) in inputTextDatas" :key="index" @input="updateInput"></inputbind>
-    </article>
-    <template v-if="isManual">
-      <article class="article article-imap">
-        <h4>{{receiverDatas.title}}</h4>
-        <inputbind :inputDatas="item" v-for="(item, index) in receiverDatas.datas" :key="index" @input="updateInput"></inputbind>
+    <template v-if="!isBindStart">
+      <article class="article">
+        <inputbind :inputDatas="item" v-for="(item, index) in inputTextDatas" :key="index" @input="updateInput"></inputbind>
       </article>
-      <article class="article article-imap">
-        <h4>{{sendDatas.title}}</h4>
-        <inputbind :inputDatas="item" v-for="(item, index) in sendDatas.datas" :key="index" @input="updateInput"></inputbind>
-      </article>
+      <template v-if="isManual">
+        <article class="article article-imap">
+          <h4>{{receiverDatas.title}}</h4>
+          <inputbind :inputDatas="item" v-for="(item, index) in receiverDatas.datas" :key="index" @input="updateInput"></inputbind>
+        </article>
+        <article class="article article-imap">
+          <h4>{{sendDatas.title}}</h4>
+          <inputbind :inputDatas="item" v-for="(item, index) in sendDatas.datas" :key="index" @input="updateInput"></inputbind>
+        </article>
+      </template>
+      <footer class="footer">
+        <inputbutton :inputDatas="inputbuttonBind" :isDisabled="disabled" @click.submit.stop.prevent.native="submit"></inputbutton>
+      </footer>
     </template>
-    <footer class="footer">
-      <inputbutton :inputDatas="inputbuttonDatas" :isDisabled="disabled" @click.submit.stop.prevent.native="submit"></inputbutton>
-    </footer>
+    <template v-if="isBindStart">
+      <carousel></carousel>
+      <footer class="footer-carousel">
+        <inputbutton :inputDatas="inputbuttonCarousel" @click.submit.stop.prevent.native="jumpBindPage"></inputbutton>
+      </footer>
+    </template>
   </section>
 </template>
 
@@ -25,15 +33,18 @@ import Success from '@/components/base/success'
 import Api from '@/core/service/service'
 import Inputbind from '@/components/base/inputbind'
 import Inputbutton from '@/components/base/inputbutton'
+import Carousel from '@/components/base/carousel'
 
 export default {
   name: 'app',
   components: {
     Inputbind,
-    Inputbutton
+    Inputbutton,
+    Carousel
   },
   data () {
     return {
+      isBindStart: true, // 绑定页进场流程
       loadingTimer: null,
       otherReason: '',
       disabled: true,
@@ -49,9 +60,13 @@ export default {
         placeholder: '请输入密码',
         name: 'password'
       }],
-      inputbuttonDatas: {
+      inputbuttonBind: {
         text: '绑定',
         type: 'submit'
+      },
+      inputbuttonCarousel: {
+        text: '绑定我的邮箱',
+        type: 'button'
       },
       receiverDatas: {
         title: '收信',
@@ -290,6 +305,10 @@ export default {
         }, requests)
       }
       return result
+    },
+    jumpBindPage () {
+      this.isBindStart = false
+      document.body.style.backgroundColor = '#f2f2f2'
     }
   }
 }
@@ -316,5 +335,22 @@ export default {
 }
 .footer{
   margin-top: 15/25rem;
+}
+.footer-carousel{
+   margin-top: 0;
+   position:fixed;
+   bottom: 0;
+   left: 0;
+   padding: 15/25rem;
+   width:100%;
+   background: #fff;
+   z-index: 20;
+   .button-wrap{
+     button{
+      color: #fff;
+      background: #fcb058;
+      border-radius: 5/25rem;
+     }
+   }
 }
 </style>
