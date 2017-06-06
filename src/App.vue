@@ -34,6 +34,7 @@ import Api from '@/core/service/service'
 import Inputbind from '@/components/base/inputbind'
 import Inputbutton from '@/components/base/inputbutton'
 import Carousel from '@/components/base/carousel'
+import Jsapi from '@/core/base/jsapi'
 
 export default {
   name: 'app',
@@ -44,6 +45,7 @@ export default {
   },
   data () {
     return {
+      isJsapiReady: false, // 判断jsapi是否被初始化
       isBindStart: true, // 绑定页进场流程
       loadingTimer: null,
       otherReason: '',
@@ -118,6 +120,11 @@ export default {
       }
     }
   },
+  created () {
+    Jsapi().then(() => {
+      this.isJsapiReady = true
+    })
+  },
   methods: {
     showLoading (useJsapi = true, showText = '加载中...') {
       if (this.loadingTimer) return
@@ -139,6 +146,11 @@ export default {
         FSOpen.widget.hidePreloader()
       } else {
         Loading.close()
+      }
+    },
+    bindSuccess () {
+      if (this.isJsapiReady) {
+        // 这里执行jsapi接口调用操作
       }
     },
     scrollBottom () {

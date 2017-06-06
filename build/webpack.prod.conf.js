@@ -66,7 +66,8 @@ var webpackConfig = merge(baseWebpackConfig, {
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency',
       // other custom option
-      buildEnv: config.base.buildEnv
+      buildEnv: config.base.buildEnv,
+      jsapi: '//www.fxiaoke.com/open/jsapi/2.0.0/fsapi.min.js'
     }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({

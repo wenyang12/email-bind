@@ -32,7 +32,8 @@ module.exports = merge(baseWebpackConfig, {
       template: 'index.html',
       inject: true,
       // other custom option
-      buildEnv: config.base.buildEnv
+      buildEnv: config.base.buildEnv,
+      jsapi:"//www.fxiaoke.com/open/jsapi/2.0.0/fsapi.min.js"
     }),
     new FriendlyErrorsPlugin()
   ]
