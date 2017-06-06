@@ -10,9 +10,9 @@ if (process.env.NODE_ENV === 'development') {
   let date = new Date()
   date.setDate(date.getDate() + (30 * 3600))
   date.toGMTString()
-  document.cookie = `fs_token=${Token.fsToken};path=/;expires=${date}`
-  document.cookie = `FSAuthX=${Token.FSAuthX};path=/;expires=${date}`
-  document.cookie = `FSAuthXC=${Token.FSAuthXC};path=/;expires=${date}`
+  for (var key in Token) {
+    document.cookie = `${key}=${Token[key]};path=/;expires=${date}`
+  }
 }
 
 /* eslint-disable no-extend-native */

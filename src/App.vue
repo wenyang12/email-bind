@@ -1,32 +1,40 @@
 <template>
   <section>
-    <template v-if="!isBindStart">
+    <template v-if="isBindPage && !isBind">
       <article class="article">
-        <inputbind :inputDatas="item" v-for="(item, index) in inputTextDatas" :key="index" @input="updateInput"></inputbind>
+        <inputbind :inputDatas="item" v-for="item in inputTextDatas" :key="item.name" @input="updateInput"></inputbind>
       </article>
       <template v-if="isManual">
-        <article class="article article-imap">
+        <article class="article article-istitle">
           <h4>{{receiverDatas.title}}</h4>
-          <inputbind :inputDatas="item" v-for="(item, index) in receiverDatas.datas" :key="index" @input="updateInput"></inputbind>
+          <inputbind :inputDatas="item" v-for="item in receiverDatas.datas" :key="item.name" @input="updateInput"></inputbind>
         </article>
-        <article class="article article-imap">
+        <article class="article article-istitle">
           <h4>{{sendDatas.title}}</h4>
-          <inputbind :inputDatas="item" v-for="(item, index) in sendDatas.datas" :key="index" @input="updateInput"></inputbind>
+          <inputbind :inputDatas="item" v-for="item in sendDatas.datas" :key="item.name" @input="updateInput"></inputbind>
         </article>
       </template>
       <footer class="footer">
         <inputbutton :inputDatas="inputbuttonBind" :isDisabled="disabled" @click.submit.stop.prevent.native="submit"></inputbutton>
       </footer>
     </template>
-    <template v-if="isBindStart">
+    <template v-if="isBindStart && !isBind">
       <carousel></carousel>
       <footer class="footer-carousel">
         <inputbutton :inputDatas="inputbuttonCarousel" @click.submit.stop.prevent.native="jumpBindPage"></inputbutton>
       </footer>
     </template>
+    <template v-if="isBind">
+      <article class="article article-istitle">
+          <h4>{{emailDatas.title}}</h4>
+          <inputbind :inputDatas="item" v-for="item in emailDatas.datas" :key="item.name" @input="updateInput"></inputbind>
+      </article>
+      <footer class="footer">
+        <inputbutton :inputDatas="inputbuttonSend" :isDisabled="disabled" @click.submit.stop.prevent.native="send"></inputbutton>
+      </footer>
+    </template>
   </section>
 </template>
-
 <script>
 import Loading from '@/components/base/loading'
 import Success from '@/components/base/success'
@@ -45,12 +53,15 @@ export default {
   },
   data () {
     return {
+      isBind: false, // 判断是否绑定
+      isBindPage: false, // 绑定是否显示绑定页
+      isBindStart: false, // 绑定开场图片页
       isJsapiReady: false, // 判断jsapi是否被初始化
-      isBindStart: true, // 绑定页进场流程
       loadingTimer: null,
       otherReason: '',
       disabled: true,
       isManual: false, // 是否为复杂绑定
+      sendEmail: '', // 发件人
       inputTextDatas: [{
         type: 'text',
         text: '邮箱账号',
@@ -64,6 +75,10 @@ export default {
       }],
       inputbuttonBind: {
         text: '绑定',
+        type: 'submit'
+      },
+      inputbuttonSend: {
+        text: '发送',
         type: 'submit'
       },
       inputbuttonCarousel: {
@@ -120,10 +135,32 @@ export default {
       }
     }
   },
+  computed: {
+    emailDatas () {
+      return {
+        title: '收件人会收到付款订单邮件',
+        datas: [{
+          type: 'noinput',
+          text: ' 发件人',
+          placeholder: this.sendEmail,
+          name: 'sendEmail'
+        }, {
+          type: 'text',
+          text: '收件人',
+          placeholder: '请输入收件人邮箱',
+          name: 'toList'
+        }]
+      }
+    }
+  },
   created () {
     Jsapi().then(() => {
       this.isJsapiReady = true
     })
+    this.getBindMsg()
+    if (this.isBind) { // 已绑定，跳转到发送页面
+      document.body.style.backgroundColor = '#f2f2f2'
+    }
   },
   methods: {
     showLoading (useJsapi = true, showText = '加载中...') {
@@ -151,6 +188,11 @@ export default {
     bindSuccess () {
       if (this.isJsapiReady) {
         // 这里执行jsapi接口调用操作
+        FSOpen.webview.close({
+          extras: {
+            data: 1
+          }
+        })
       }
     },
     scrollBottom () {
@@ -174,10 +216,7 @@ export default {
           if (res.errorCode === 0) {
             let data = res.data
             if (data === 1) { // 绑定成功
-              Success.toast({
-                duration: 1000,
-                text: '绑定成功'
-              })
+              this.getBindMsg()
             } else if (data === 2) { // 继续验证：需要提供邮箱补充信息
               this.isManual = true
               this.requests.isReceiveSsl = false
@@ -214,10 +253,7 @@ export default {
           if (res.errorCode === 0) {
             let data = res.data && res.data
             if (data === 1) { // 绑定成功
-              Success.toast({
-                duration: 1000,
-                text: '绑定成功'
-              })
+              this.getBindMsg()
             } else { // 绑定失败
               if (data === -1) {
                 Success.toast({
@@ -243,13 +279,13 @@ export default {
     // 接收子组件通过事件传递过来的实时input值
     updateInput (value, name) {
       this.requests[name] = value
-      if (!this.isManual) { // 简单绑定
+      if (!this.isManual && !this.isBind) { // 简单绑定
         if (this.requests['account'] || this.requests['password']) {
           this.disabled = false
         } else {
           this.disabled = true
         }
-      } else { // 复杂绑定
+      } else { // 复杂绑定或发送页
         this.disabled = true
         for (var key in this.requests) {
           if (this.requests[key]) {
@@ -258,7 +294,7 @@ export default {
         }
       }
     },
-    validate (cb) {
+    validate (cb) { // 验证简单绑定和复杂绑定
       let requestPrams = this.requestPrams()
       let flag = true
       if (requestPrams['account'] && !/^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(requestPrams['account'])) {
@@ -295,7 +331,18 @@ export default {
       if (!flag) { return }
       cb && cb(requestPrams)
     },
-    requestPrams () {
+    validateSend (cb) { // 发送验证
+      let tolist = this.requests['toList']
+      if (tolist && !/^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(tolist)) {
+        Success.toast({
+          duration: 2000,
+          text: '收件人格式错误'
+        })
+        return
+      }
+      cb && cb()
+    },
+    requestPrams () { // 构建简单绑定和复杂绑定的请求对象，用于发送请求
       let result = {}
       let requests = this.requests
       if (!this.isManual) { // 简单绑定
@@ -319,8 +366,44 @@ export default {
       return result
     },
     jumpBindPage () {
+      this.isBindPage = true
       this.isBindStart = false
       document.body.style.backgroundColor = '#f2f2f2'
+    },
+    send () {
+      // 调用发送接口
+      this.validateSend(() => {
+        // 验证通过
+        console.log(this.requests)
+      })
+    },
+    getBindMsg () {
+      Api.get({ // 用来判断邮箱是否绑定
+        method: 'get'
+      }).then(res => {
+        if (res.errorCode === 0) { // 成功
+          let data = res.data && res.data || {}
+          this.sendEmail = data.account || ''
+          if (data.status === 3) { // 未绑定
+            this.isBind = false
+            this.isBindStart = true
+          } else {
+            this.isBind = true
+            this.isBindStart = false
+            document.body.style.backgroundColor = '#f2f2f2'
+          }
+        } else if (res.errorCode === -10008) { // 未绑定
+          this.isBind = false
+          this.isBindStart = true
+        } else {
+          this.isBind = false
+          this.isBindStart = true
+          Success.toast({
+            duration: 1000,
+            text: res.errorMessage
+          })
+        }
+      })
     }
   }
 }
@@ -340,7 +423,7 @@ export default {
     margin-bottom: 15/25rem;
   }
 }
-.article-imap{
+.article-istitle{
   .input-left{
     flex: 0 0 88/25rem;
   }

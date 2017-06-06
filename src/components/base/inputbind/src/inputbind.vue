@@ -1,14 +1,18 @@
 <template>
   <div class="input-wraper" >
     <div  class="input-left" :class="'label-' + inputDatas.name" >{{inputDatas.text}}</div>
-    <div class="input-right" :class="'input-' + inputDatas.type"><input :type="inputDatas.type" :class="{active:value}" :placeholder="inputDatas.placeholder"  :name="inputDatas.name" :value="value" @input="updateValue($event.target)" @change="radioChange($event.target)" ></div>
+    <div class="input-right" :class="'input-' + inputDatas.type">
+    <input v-if="inputDatas.type !== 'noinput'" :type="inputDatas.type" :key="key" :class="{active:value}" :placeholder="inputDatas.placeholder"  :name="inputDatas.name" :value="value" @input="updateValue($event.target)" @change="radioChange($event.target)" >
+    <p v-if="inputDatas.type === 'noinput'">{{inputDatas.placeholder}}</p>
+    </div>
   </div>
 </template>
 
 <script>
   export default {
     props: {
-      inputDatas: Object
+      inputDatas: Object,
+      key: Number
     },
     data () {
       return{
