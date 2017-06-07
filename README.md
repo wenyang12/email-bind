@@ -23,6 +23,6 @@ npm run product --report
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 ## 访问路径
-1. ceshi113: https://www.ceshi113.com/fsh5/email-questionnaire/5.7/index.html
-2. ceshi112: https://www.ceshi112.com/fsh5/email-questionnaire/5.7/index.html
-3. fxiaoke: https://www.fxiaoke.com/open/email/email-questionnaire/index.html
+1. ceshi113: https://www.ceshi113.com/fsh5/email-bind/5.7/index.html
+2. ceshi112: https://www.ceshi112.com/fsh5/email-bind/5.7/index.html
+3. fxiaoke: https://www.fxiaoke.com/open/email/email-bind/index.html
