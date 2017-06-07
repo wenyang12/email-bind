@@ -129,7 +129,6 @@ export default {
         password: '密码不能为空',
         receiveHost: '收件服务器地址不能为空',
         receivePort: '收件服务器端口不能为空',
-        isReceiveSsl: '密码不能为空',
         sendHost: '发件服务器地址不能为空',
         sendPort: '发件服务器端口不能为空'
       }
@@ -219,8 +218,6 @@ export default {
               this.getBindMsg()
             } else if (data === 2) { // 继续验证：需要提供邮箱补充信息
               this.isManual = true
-              this.requests.isReceiveSsl = false
-              this.requests.isSendSsl = false
             } else {
               if (data === -1) {
                 Success.toast({
@@ -236,7 +233,6 @@ export default {
             }
           } else {
             Success.toast({
-              duration: 1000,
               text: res.errorMessage
             })
           }
@@ -269,7 +265,6 @@ export default {
             }
           } else {
             Success.toast({
-              duration: 1000,
               text: res.errorMessage
             })
           }
@@ -296,24 +291,20 @@ export default {
     },
     validate (cb) { // 验证简单绑定和复杂绑定
       let requestPrams = this.requestPrams()
-      let flag = true
       if (requestPrams['account'] && !/^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(requestPrams['account'])) {
         Success.toast({
-          duration: 2000,
           text: '邮箱帐号格式错误'
         })
         return
       }
       if (requestPrams['receivePort'] && !requestPrams['receivePort'].match(/\d+/)) {
         Success.toast({
-          duration: 2000,
           text: '收信服务器端口必须为数字'
         })
         return
       }
       if (requestPrams['sendPort'] && !requestPrams['sendPort'].match(/\d+/)) {
         Success.toast({
-          duration: 2000,
           text: '发信服务器端口必须为数字'
         })
         return
@@ -321,21 +312,17 @@ export default {
       for (var key in requestPrams) {
         if (!requestPrams[key] && requestPrams[key] !== 0) {
           Success.toast({
-            duration: 2000,
             text: this.errorTip[key]
           })
-          flag = false
-          break
+          return
         }
       }
-      if (!flag) { return }
       cb && cb(requestPrams)
     },
     validateSend (cb) { // 发送验证
       let tolist = this.requests['toList']
       if (tolist && !/^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(tolist)) {
         Success.toast({
-          duration: 2000,
           text: '收件人格式错误'
         })
         return
@@ -345,6 +332,7 @@ export default {
     requestPrams () { // 构建简单绑定和复杂绑定的请求对象，用于发送请求
       let result = {}
       let requests = this.requests
+      console.log(requests)
       if (!this.isManual) { // 简单绑定
         result = {
           account: requests.account || '', // 邮箱账号

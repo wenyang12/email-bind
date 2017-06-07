@@ -10,7 +10,7 @@ let timer;
 
 export default {
   toast(options = {}) {
-    let duration = options.duration || 3000;
+    let duration = options.duration || 2000;
     if (!toastInstance) {
       toastInstance = new Indicator({
         el: document.createElement('div'),

@@ -2,7 +2,7 @@
   <div class="input-wraper" >
     <div  class="input-left" :class="'label-' + inputDatas.name" >{{inputDatas.text}}</div>
     <div class="input-right" :class="'input-' + inputDatas.type">
-    <input v-if="inputDatas.type !== 'noinput'" :type="inputDatas.type" :key="key" :class="{active:value}" :placeholder="inputDatas.placeholder"  :name="inputDatas.name" :value="value" @input="updateValue($event.target)" @change="radioChange($event.target)" >
+    <input v-if="inputDatas.type !== 'noinput'" :type="inputDatas.type"  :class="{active:value}" :placeholder="inputDatas.placeholder"  :name="inputDatas.name" :value="value" @input="updateValue($event.target)" @change="radioChange($event.target)" >
     <p v-if="inputDatas.type === 'noinput'">{{inputDatas.placeholder}}</p>
     </div>
   </div>
@@ -11,8 +11,7 @@
 <script>
   export default {
     props: {
-      inputDatas: Object,
-      key: Number
+      inputDatas: Object
     },
     data () {
       return{
@@ -30,7 +29,7 @@
         if (target.type !== 'checkbox') {
           return
         }
-        let value = target.checked;
+        let value = target.checked ? 1 : 0
         let name = target.name
         this.value = value
         this.$emit('input',value,name)
