@@ -15,7 +15,7 @@ var assetsPublicPath = '';
 if(buildEnv === 'www'){
   assetsPublicPath = `//www.${SITE[buildEnv]}/open/email/${APP}/${BUILD}/`
 }else{
-  assetsPublicPath = `//${buildEnv}.fspage.com/h5/${APP}/${BUILD}/`
+  assetsPublicPath = `//www.${SITE[buildEnv]}/fsh5/${APP}/${BUILD}/`
 }
 
 module.exports = {
