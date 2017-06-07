@@ -43,6 +43,7 @@ import Inputbind from '@/components/base/inputbind'
 import Inputbutton from '@/components/base/inputbutton'
 import Carousel from '@/components/base/carousel'
 import Jsapi from '@/core/base/jsapi'
+import Util from '@/core/base/util'
 
 export default {
   name: 'app',
@@ -184,9 +185,9 @@ export default {
         Loading.close()
       }
     },
-    bindSuccess () {
+    sendSuccess () { // 发送成功回调方法
       if (this.isJsapiReady) {
-        // 这里执行jsapi接口调用操作
+        // 这里执行jsapi接口调用操作，关闭当前页
         FSOpen.webview.close({
           extras: {
             data: 1
@@ -332,7 +333,6 @@ export default {
     requestPrams () { // 构建简单绑定和复杂绑定的请求对象，用于发送请求
       let result = {}
       let requests = this.requests
-      console.log(requests)
       if (!this.isManual) { // 简单绑定
         result = {
           account: requests.account || '', // 邮箱账号
@@ -360,9 +360,32 @@ export default {
     },
     send () {
       // 调用发送接口
+      let self = this
       this.validateSend(() => {
         // 验证通过
-        console.log(this.requests)
+        this.showLoading(false, '发送中...')
+        this.requests['toList'] = [this.requests['toList']]
+        Api.sendEACollectEmailForWeb({ // 用的FCP接口 要加上urlPrefix，因为默认掉的时https接口
+          data: this.requests,
+          urlPrefix: '/FHH/EM1APAY/',
+          always: () => { this.closeLoading(false) }
+        }).then(res => {
+          let data = res.Value && res.Value || {}
+          if (data.errorCode === 0) { // 发送成功
+            // 通过jsapi关闭当前页
+            Success.toast({
+              duration: 1000,
+              text: '发送成功',
+              afterClose () {
+                self.sendSuccess()
+              }
+            })
+          } else {
+            Success.toast({
+              text: data.errorMessage
+            })
+          }
+        })
       })
     },
     getBindMsg () {
@@ -379,6 +402,7 @@ export default {
             this.isBind = true
             this.isBindStart = false
             document.body.style.backgroundColor = '#f2f2f2'
+            this.requests['orderNo'] = Util.getQuery('orderNo') || '10257463316690665472'
           }
         } else if (res.errorCode === -10008) { // 未绑定
           this.isBind = false

@@ -51,6 +51,10 @@ module.exports = {
       '/open/emailproxy': {
         target: 'http://10.113.32.48:8004',
         changeOrigin: true
+      },
+      '/FHH/EM1APAY': {
+        target:'http://10.113.32.21:8008',
+        changeOrigin: true
       }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
