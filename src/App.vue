@@ -138,9 +138,9 @@ export default {
         account: '邮箱账号不能为空',
         password: '密码不能为空',
         receiveHost: '收件服务器地址不能为空',
-        receivePort: '收件服务器端口不能为空',
+        receivePort: '收件端口不能为空',
         sendHost: '发件服务器地址不能为空',
-        sendPort: '发件服务器端口不能为空'
+        sendPort: '发件端口不能为空'
       }
     }
   },
