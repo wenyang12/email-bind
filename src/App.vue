@@ -1,17 +1,23 @@
 <template>
   <section>
     <template v-if="isBindPage && !isBind">
+      <header v-if="isManual"  class="email-bind-header">
+        <ul @click="tapImapOrPop">
+          <li :class="{active:isImap}">IMAP</li>
+          <li :class="{active:isPop}">POP</li>
+        </ul>
+      </header>
       <article class="article">
-        <inputbind :inputDatas="item" v-for="item in inputTextDatas" :key="item.name" @input="updateInput"></inputbind>
+        <inputbind :inputDatas="item" v-for="item in inputTextDatas" :val="item.val && item.val" :key="item.name" @input="updateInput"></inputbind>
       </article>
       <template v-if="isManual">
         <article class="article article-istitle">
           <h4>{{receiverDatas.title}}</h4>
-          <inputbind :inputDatas="item" v-for="item in receiverDatas.datas" :key="item.name" @input="updateInput"></inputbind>
+          <inputbind :inputDatas="item" v-for="item in receiverDatas.datas" :val="item.val && item.val" :key="receiverDatas.id" @input="updateInput"></inputbind>
         </article>
         <article class="article article-istitle">
           <h4>{{sendDatas.title}}</h4>
-          <inputbind :inputDatas="item" v-for="item in sendDatas.datas" :key="item.name" @input="updateInput"></inputbind>
+          <inputbind :inputDatas="item" v-for="item in sendDatas.datas" :val="item.val && item.val" :key="item.name" @input="updateInput"></inputbind>
         </article>
       </template>
       <footer class="footer">
@@ -58,6 +64,7 @@ export default {
       isBindPage: false, // 绑定是否显示绑定页
       isBindStart: false, // 绑定开场图片页
       isJsapiReady: false, // 判断jsapi是否被初始化
+      isImap: true, // 判断是否是IMAP绑定
       loadingTimer: null,
       otherReason: '',
       disabled: true,
@@ -92,6 +99,7 @@ export default {
           type: 'text',
           text: '服务器地址',
           placeholder: 'imap.example.com',
+          val: '',
           name: 'receiveHost'
         }, {
           type: 'text',
@@ -111,6 +119,7 @@ export default {
           type: 'text',
           text: '服务器地址',
           placeholder: 'imap.example.com',
+          val: '',
           name: 'sendHost'
         }, {
           type: 'text',
@@ -151,6 +160,9 @@ export default {
           name: 'toList'
         }]
       }
+    },
+    isPop () {
+      return !this.isImap
     }
   },
   created () {
@@ -218,7 +230,7 @@ export default {
             if (data === 1) { // 绑定成功
               this.getBindMsg()
             } else if (data === 2) { // 继续验证：需要提供邮箱补充信息
-              this.isManual = true
+              this.jumpManualBindPage()
             } else {
               if (data === -1) {
                 Success.toast({
@@ -342,7 +354,7 @@ export default {
         result = Object.assign({}, {
           account: '',
           password: '',
-          emailType: 2, // 收件服务器类型 1:pop 2:imap
+          emailType: this.isImap ? 2 : 1, // 收件服务器类型 1:pop 2:imap
           receiveHost: '', // 收件服务器地址
           receivePort: '', // 收件服务器端口
           isReceiveSsl: 0, // 是否启用SSL收信 0:表示不使用 1：表示使用
@@ -416,6 +428,64 @@ export default {
           })
         }
       })
+    },
+    tapImapOrPop (evt) { // 切换imap 和 pop
+      let target = evt.target
+      if (target.innerHTML === 'IMAP') {
+        this.isImap = true
+      } else {
+        this.isImap = false
+      }
+      // 切换时，更改了收信服务器的数据
+      this.updateReceiverDatas()
+    },
+    jumpManualBindPage () { // 绑定后跳转复杂绑定
+      this.isManual = true
+      this.updateReceiverDatas()
+      this.updateSendDatas()
+      this.updateInputTextDatas()
+    },
+    updateReceiverDatas () { // 更新复杂绑定收信服务器数据
+      let host = this.isImap ? 'imap' : 'pop'
+      let receiveHostValue = host + '.' + this.requests['account'].split('@')[1]
+      this.receiverDatas.datas.splice(0, 1, {
+        type: 'text',
+        text: '服务器地址',
+        placeholder: 'imap.example.com',
+        val: receiveHostValue,
+        name: 'receiveHost'
+      })
+      this.receiverDatas.id = host // 触发更新对象
+      // 更新请求参数
+      this.requests['receiveHost'] = receiveHostValue
+      this.requests['isReceiveSsl'] = 0
+      this.requests['receivePort'] = ''
+    },
+    updateSendDatas () { // 更新复杂绑定发信服务器数据
+      let sendHostValue = 'smtp.' + this.requests['account'].split('@')[1]
+      this.sendDatas.datas.splice(0, 1, {
+        type: 'text',
+        text: '服务器地址',
+        placeholder: 'imap.example.com',
+        val: sendHostValue,
+        name: 'sendHost'
+      })
+      this.requests['sendHost'] = sendHostValue
+    },
+    updateInputTextDatas () {
+      this.inputTextDatas.splice(0, 2, {
+        type: 'text',
+        text: '邮箱账号',
+        placeholder: '请输入企业邮箱账号',
+        val: this.requests['account'],
+        name: 'account'
+      }, {
+        type: 'password',
+        text: '密  码',
+        placeholder: '请输入密码',
+        val: this.requests['password'],
+        name: 'password'
+      })
     }
   }
 }
@@ -423,6 +493,26 @@ export default {
 
 <style lang="less">
 @import '~@/assets/style/all';
+@activeColor: #fcb058;
+.email-bind-header{
+  ul{
+    display: flex;
+   
+    width:100%;
+    background: #fff;
+    li{
+      border-bottom:2px solid transparent;
+      width:50%;
+      height: 40/25rem;
+      line-height:40/25rem;
+      text-align:center;
+      &.active{
+        border-color: @activeColor;
+        color:  @activeColor;
+      }
+    }
+  }
+}
 .article{
   margin-top: 15/25rem;
   h4{
@@ -455,7 +545,7 @@ export default {
    .button-wrap{
      button{
       color: #fff;
-      background: #fcb058;
+      background:  @activeColor;
       border-radius: 5/25rem;
      }
    }
