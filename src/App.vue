@@ -168,11 +168,14 @@ export default {
   created () {
     Jsapi().then(() => {
       this.isJsapiReady = true
+      this.getBindMsg(() => {
+        this.setTitle()
+      })
+    }).catch(() => {
+      this.getBindMsg(() => {
+        this.setTitle()
+      })
     })
-    this.getBindMsg()
-    if (this.isBind) { // 已绑定，跳转到发送页面
-      document.body.style.backgroundColor = '#f2f2f2'
-    }
   },
   methods: {
     showLoading (useJsapi = true, showText = '加载中...') {
@@ -198,6 +201,9 @@ export default {
       }
     },
     sendSuccess () { // 发送成功回调方法
+      if (window.localStorage) {
+        window.localStorage.setItem('__fs__entwallet__email', 'back')
+      }
       if (this.isJsapiReady) {
         // 这里执行jsapi接口调用操作，关闭当前页
         FSOpen.webview.close({
@@ -228,7 +234,9 @@ export default {
           if (res.errorCode === 0) {
             let data = res.data
             if (data === 1) { // 绑定成功
-              this.getBindMsg()
+              this.getBindMsg(() => {
+                this.setTitle()
+              })
             } else if (data === 2) { // 继续验证：需要提供邮箱补充信息
               this.jumpManualBindPage()
             } else {
@@ -262,7 +270,9 @@ export default {
           if (res.errorCode === 0) {
             let data = res.data && res.data
             if (data === 1) { // 绑定成功
-              this.getBindMsg()
+              this.getBindMsg(() => {
+                this.setTitle()
+              })
             } else { // 绑定失败
               if (data === -1) {
                 Success.toast({
@@ -400,7 +410,7 @@ export default {
         })
       })
     },
-    getBindMsg () {
+    getBindMsg (cb) {
       Api.get({ // 用来判断邮箱是否绑定
         method: 'get'
       }).then(res => {
@@ -410,11 +420,8 @@ export default {
           if (data.status === 3) { // 未绑定
             this.isBind = false
             this.isBindStart = true
-          } else {
-            this.isBind = true
-            this.isBindStart = false
-            document.body.style.backgroundColor = '#f2f2f2'
-            this.requests['orderNo'] = Util.getQuery('orderNo') || '10257463316690665472'
+          } else { // 已绑定
+            this.setInitBinded()
           }
         } else if (res.errorCode === -10008) { // 未绑定
           this.isBind = false
@@ -427,7 +434,16 @@ export default {
             text: res.errorMessage
           })
         }
+        cb && cb()
       })
+    },
+    setInitBinded () { // 初始化已绑定的设置
+      this.isBind = true
+      this.isBindStart = false
+      document.body.style.backgroundColor = '#f2f2f2'
+      this.requests = {} // 初始化请求对象
+      this.requests['orderNo'] = Util.getQuery('orderNo') || ''
+      this.requests['urlParameter'] = Util.getQuery('urlParameter') || ''
     },
     tapImapOrPop (evt) { // 切换imap 和 pop
       let target = evt.target
@@ -486,6 +502,20 @@ export default {
         val: this.requests['password'],
         name: 'password'
       })
+    },
+    setTitle () {
+      if (this.isBind) { // 已绑定，跳转到发送页面
+        document.title = '发邮件'
+        FSOpen.webview.navbar.setTitle({ // 已绑定设定的标题
+          title: '发邮件'
+        })
+        document.body.style.backgroundColor = '#f2f2f2'
+      } else {
+        document.title = '绑定邮箱'
+        FSOpen.webview.navbar.setTitle({ // 未绑定设定的标题
+          title: '绑定邮箱'
+        })
+      }
     }
   }
 }
