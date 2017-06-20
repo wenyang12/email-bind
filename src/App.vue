@@ -201,9 +201,6 @@ export default {
       }
     },
     sendSuccess () { // 发送成功回调方法
-      if (window.localStorage) {
-        window.localStorage.setItem('__fs__entwallet__email', 'back')
-      }
       if (this.isJsapiReady) {
         // 这里执行jsapi接口调用操作，关闭当前页
         FSOpen.webview.close({
