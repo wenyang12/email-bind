@@ -13,9 +13,9 @@ var BUILD = 'dist';
 var APP = 'email-bind';
 var assetsPublicPath = '';
 if(buildEnv === 'www'){
-  assetsPublicPath = `//www.${SITE[buildEnv]}/open/email/${APP}/${BUILD}/`
+  assetsPublicPath = `//www.${SITE[buildEnv]}/open/email/${APP}/`
 }else{
-  assetsPublicPath = `//www.${SITE[buildEnv]}/fsh5/${APP}/${BUILD}/`
+  assetsPublicPath = `//www.${SITE[buildEnv]}/fsh5/${APP}/`
 }
 
 module.exports = {
