@@ -14,6 +14,8 @@ var APP = 'email-bind';
 var assetsPublicPath = '';
 if(buildEnv === 'www'){
   assetsPublicPath = `//www.${SITE[buildEnv]}/open/email/${APP}/`
+}else if(buildEnv === 'ceshi112'){
+  assetsPublicPath = `//${SITE[buildEnv]}.fspage.com/h5/${APP}/${BUILD}`
 }else{
   assetsPublicPath = `//www.${SITE[buildEnv]}/fsh5/${APP}/`
 }
