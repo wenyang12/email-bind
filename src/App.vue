@@ -60,6 +60,7 @@ export default {
   },
   data () {
     return {
+      openBindStart: false, // 是否开启绑定页的开场动画
       isBind: false, // 判断是否绑定
       isBindPage: false, // 绑定是否显示绑定页
       isBindStart: false, // 绑定开场图片页
@@ -415,17 +416,14 @@ export default {
           let data = res.data && res.data || {}
           this.sendEmail = data.account || ''
           if (data.status === 3) { // 未绑定
-            this.isBind = false
-            this.isBindStart = true
+            this.setUnbindStatus()
           } else { // 已绑定
             this.setInitBinded()
           }
         } else if (res.errorCode === -10008) { // 未绑定
-          this.isBind = false
-          this.isBindStart = true
+          this.setUnbindStatus()
         } else {
-          this.isBind = false
-          this.isBindStart = true
+          this.setUnbindStatus()
           Success.toast({
             duration: 1000,
             text: res.errorMessage
@@ -433,6 +431,10 @@ export default {
         }
         cb && cb()
       })
+    },
+    setUnbindStatus () {
+      this.isBind = false
+      this.openBindStart && (this.isBindStart = true) || this.jumpBindPage()
     },
     setInitBinded () { // 初始化已绑定的设置
       this.isBind = true
