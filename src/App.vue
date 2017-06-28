@@ -297,6 +297,7 @@ export default {
     // 接收子组件通过事件传递过来的实时input值
     updateInput (value, name) {
       this.requests[name] = value
+      console.log('input')
       if (!this.isManual && !this.isBind) { // 简单绑定
         if (this.requests['account'] || this.requests['password']) {
           this.disabled = false
@@ -304,6 +305,7 @@ export default {
           this.disabled = true
         }
       } else { // 复杂绑定或发送页
+        console.log('发送')
         this.disabled = true
         for (var key in this.requests) {
           if (this.requests[key]) {
@@ -411,6 +413,7 @@ export default {
       })
     },
     getBindMsg (cb) {
+      var self = this
       Api.get({ // 用来判断邮箱是否绑定
         method: 'get'
       }).then(res => {
@@ -431,6 +434,7 @@ export default {
             text: res.errorMessage
           })
         }
+        self.requests = {}
         cb && cb()
       })
     },
