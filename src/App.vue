@@ -252,6 +252,7 @@ export default {
             }
           } else {
             Success.toast({
+              duration: 4000,
               text: res.errorMessage
             })
           }
@@ -286,6 +287,7 @@ export default {
             }
           } else {
             Success.toast({
+              duration: 4000,
               text: res.errorMessage
             })
           }
