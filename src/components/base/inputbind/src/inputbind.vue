@@ -47,6 +47,7 @@
     height: @inputHeight;
     line-height: @inputHeight;
     font-size: 17/25rem;
+    align-items: baseline;
     color:#000;
     background: #fff;
     box-shadow:inset 15/25rem 0 0 0 #fff, inset 0 1px 0 0 #eee, 0 1px 0 0 #eee;
@@ -86,8 +87,8 @@
     }
   }
   .input-left{
-    flex: 0 0 68/25rem;
-    text-align: right;
+    flex: 0 0 95/25rem;
+    text-align: left;
   }
   .label-password{
     letter-spacing:9.5/25rem;
@@ -97,7 +98,6 @@
   }
   .input-right{
   flex: auto;
-  margin-left: 24/25rem;
   input{
     width: 100%;
   }
