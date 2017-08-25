@@ -63,7 +63,7 @@ export default {
       openBindStart: false, // 是否开启绑定页的开场动画
       isBind: false, // 判断是否绑定
       isBindPage: false, // 绑定是否显示绑定页
-      isBindStart: false, // 绑定开场图片页
+      isBindStart: true, // 绑定开场图片页
       isJsapiReady: false, // 判断jsapi是否被初始化
       isImap: true, // 判断是否是IMAP绑定
       loadingTimer: null,
