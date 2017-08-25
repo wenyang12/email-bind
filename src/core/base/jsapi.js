@@ -3,7 +3,7 @@ import device from '@/core/base/device'
 
 export default function (config) {
   const env = /\w+\.(\w+)\.\w+/g.test(location.host)
-  const appId = (env && APPID[RegExp.$1]) || APPID['ceshi113']
+  const appId = (env && APPID[RegExp.$1]) || APPID['ceshi']
   return new Promise(function (resolve, reject) {
     FSOpen && FSOpen.config(Object.assign({appId}, config))
     .ready((resp) => {
