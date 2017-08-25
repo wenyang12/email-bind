@@ -2,6 +2,7 @@ import request from 'superagent'
 import Cookies from 'js-cookie'
 import _ from 'lodash'
 
+let mock = true // 是否开启mock数据
 /**
  * 通用ajax方法
  * @param {*} opt 选项描述如下:
@@ -17,9 +18,12 @@ import _ from 'lodash'
  */
 export default {
   ajax (opt, output) {
+    opt.url = this.parseUrl(opt.url)
+    mock && (opt.method = 'get')
+    let urlPrefix = !mock ? '/open/emailproxy/web/' : 'static/mock/'
     let option = _.defaults({}, opt, {
       method: 'post',
-      urlPrefix: '/open/emailproxy/web/',
+      urlPrefix: urlPrefix,
       errAlert: 1,
       resPreproccess: false,
       data: {}
@@ -87,5 +91,14 @@ export default {
       }
     })
     return serive
+  },
+  /**
+   * 解析url位mock对于的
+   * @param {*} url 请求的url地址
+   */
+  parseUrl (url) {
+    return url.replace(/(\w+)\/(\w)(\w+)/, (word, a, b, c) => {
+      return a + b.toUpperCase() + c + '.json'
+    })
   }
 }
