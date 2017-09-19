@@ -27,3 +27,5 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 1. ceshi113: https://www.ceshi113.com/fsh5/email-bind/index.html
 2. ceshi112: https://www.ceshi112.com/fsh5/email-bind/index.html
 3. fxiaoke: https://www.fxiaoke.com/open/email/email-bind/index.html
+
+[预览效果](https://wenyang12.github.io/demo/email-bind/index.html)
