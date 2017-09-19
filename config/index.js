@@ -16,7 +16,9 @@ if(buildEnv === 'www'){
   assetsPublicPath = `//www.${SITE[buildEnv]}/open/email/${APP}/`
 }else if(buildEnv === 'ceshi112'){
   assetsPublicPath = `//${buildEnv}.fspage.com/h5/${APP}/${BUILD}`
-}else{
+}else if(buildEnv === 'empty'){
+  assetsPublicPath = `/demo/${APP}/`
+} else {
   assetsPublicPath = `//www.${SITE[buildEnv]}/fsh5/${APP}/`
 }
 

@@ -15,6 +15,7 @@ npm run dev
 npm run product -- --env=www 正式环境
 npm run product -- --env=ceshi112 112环境
 npm run product -- --env=ceshi113 113环境 (开发环境)
+npm run product -- --env=empty 使用相对路径，部署到自己的博客里
 
 # build for production and view the bundle analyzer report
 npm run product --report

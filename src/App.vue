@@ -21,13 +21,13 @@
         </article>
       </template>
       <footer class="footer">
-        <inputbutton :inputDatas="inputbuttonBind" :isDisabled="disabled" @click.submit.stop.prevent.native="submit"></inputbutton>
+        <inputbutton :inputDatas="inputbuttonBind" :isDisabled="disabled" @click.stop.prevent.native="submit"></inputbutton>
       </footer>
     </template>
     <template v-if="isBindStart && !isBind">
       <carousel></carousel>
       <footer class="footer-carousel">
-        <inputbutton :inputDatas="inputbuttonCarousel" @click.submit.stop.prevent.native="jumpBindPage"></inputbutton>
+        <inputbutton :inputDatas="inputbuttonCarousel" @click.stop.prevent.native="jumpBindPage"></inputbutton>
       </footer>
     </template>
     <template v-if="isBind">
@@ -36,7 +36,7 @@
           <inputbind :inputDatas="item" v-for="item in emailDatas.datas" :key="item.name" @input="updateInput"></inputbind>
       </article>
       <footer class="footer">
-        <inputbutton :inputDatas="inputbuttonSend" :isDisabled="disabled" @click.submit.stop.prevent.native="send"></inputbutton>
+        <inputbutton :inputDatas="inputbuttonSend" :isDisabled="disabled" @click.stop.prevent.native="send"></inputbutton>
       </footer>
     </template>
   </section>
